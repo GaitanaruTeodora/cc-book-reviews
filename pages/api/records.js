@@ -3,6 +3,7 @@ import {getCollection} from "@/js/utils/functions";
 import {ObjectId,} from 'mongodb';
 
 const COLLECTION_NAME = 'records';
+const REVIEWS_COLLECTION_NAME = 'reviews';
 
 const getRecords = async () => {
 	const collection = await getCollection(COLLECTION_NAME);
@@ -18,6 +19,17 @@ const postRecord = async (record) => {
 	const collection = await getCollection(COLLECTION_NAME);
 	return collection.insertOne(record);
 }
+
+const postReviewToBook = async (bookId, review) => {
+	const collection = await getCollection(REVIEWS_COLLECTION_NAME);
+	const result = await collection.updateOne(
+	  {_id: new ObjectId(bookId)},
+	  {$push: {reviews: review}}
+	);
+	if (result.modifiedCount === 0) {
+	  throw new Error(`Could not add review to book with ID ${bookId}`);
+	}
+  }
 
 const putRecord = async (record) => {
 	const collection = await getCollection(COLLECTION_NAME);
